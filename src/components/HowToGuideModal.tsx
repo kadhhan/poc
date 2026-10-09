@@ -98,6 +98,9 @@ export const HowToGuideModal: React.FC<HowToGuideModalProps> = ({ isOpen, onClos
                   <li>
                     <strong>Separate Air & Sea Modes:</strong> Filter air freight (airports, airlines, AWB) or sea freight (seaports, shipping lines, container equipment) independently or combined.
                   </li>
+                  <li>
+                    <strong>Carrier Details & Filtering:</strong> Every shipment features full carrier intelligence (Carrier Name, Carrier Code, Transport Mode, Flight Number for air, Vessel Name & Voyage Number for sea) with dedicated carrier filtering and instant search.
+                  </li>
                 </ul>
               </div>
 

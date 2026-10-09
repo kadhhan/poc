@@ -128,7 +128,7 @@ export const ShipmentDetailModal: React.FC<ShipmentDetailModalProps> = ({
                   <span className="w-10 sm:w-16 h-0.5 bg-blue-500/40 inline-block"></span>
                 </div>
                 <span className="text-[10px] text-slate-300 font-mono">
-                  {shipment.vesselOrFlight}
+                  {shipment.vesselOrFlight || 'Not available'}
                 </span>
               </div>
 
@@ -154,12 +154,91 @@ export const ShipmentDetailModal: React.FC<ShipmentDetailModalProps> = ({
             <div className="sm:border-l sm:border-slate-800 sm:pl-4 text-xs space-y-1 w-full sm:w-auto pt-2 sm:pt-0 border-t border-slate-800">
               <div className="flex justify-between sm:block gap-4">
                 <span className="text-slate-400">ETD: </span>
-                <span className="font-mono text-slate-200">{shipment.etd}</span>
+                <span className="font-mono text-slate-200">{shipment.etd || 'Not available'}</span>
               </div>
               <div className="flex justify-between sm:block gap-4">
                 <span className="text-slate-400">ETA: </span>
-                <span className="font-mono text-emerald-300 font-semibold">{shipment.eta}</span>
+                <span className="font-mono text-emerald-300 font-semibold">{shipment.eta || 'Not available'}</span>
               </div>
+            </div>
+          </div>
+
+          {/* Dedicated Carrier & Transport Details Card */}
+          <div className="border border-slate-200 rounded-lg p-4 bg-slate-50/70 space-y-3">
+            <div className="flex items-center justify-between border-b border-slate-200/80 pb-2.5">
+              <div className="flex items-center gap-2">
+                <div className={`p-1.5 rounded ${shipment.mode === 'Air' ? 'bg-sky-100 text-sky-800' : 'bg-teal-100 text-teal-800'}`}>
+                  {shipment.mode === 'Air' ? <Plane className="w-4 h-4" /> : <Ship className="w-4 h-4" />}
+                </div>
+                <div>
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800">
+                    Carrier & Transport Details
+                  </h3>
+                  <p className="text-[11px] text-slate-500">
+                    Carrier profile, code, and flight/vessel identifiers
+                  </p>
+                </div>
+              </div>
+              <span className={`text-xs font-semibold px-2.5 py-0.5 rounded border ${
+                shipment.mode === 'Air' ? 'bg-sky-50 text-sky-700 border-sky-200' : 'bg-teal-50 text-teal-700 border-teal-200'
+              }`}>
+                {shipment.mode ? `${shipment.mode} Freight` : 'Not available'}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
+              {/* Carrier Name */}
+              <div>
+                <span className="text-[11px] font-medium text-slate-500 block">Carrier Name</span>
+                <span className="font-bold text-slate-900 text-sm block mt-0.5">
+                  {shipment.carrier || 'Not available'}
+                </span>
+              </div>
+
+              {/* Carrier Code */}
+              <div>
+                <span className="text-[11px] font-medium text-slate-500 block">Carrier Code</span>
+                <div className="mt-0.5">
+                  {shipment.carrierCode ? (
+                    <span className="font-mono font-bold text-xs px-2 py-0.5 rounded bg-slate-200/80 text-slate-800 inline-block border border-slate-300/60">
+                      {shipment.carrierCode}
+                    </span>
+                  ) : (
+                    <span className="text-slate-500 italic">Not available</span>
+                  )}
+                </div>
+              </div>
+
+              {/* Transport Mode */}
+              <div>
+                <span className="text-[11px] font-medium text-slate-500 block">Transport Mode</span>
+                <span className="font-semibold text-slate-800 block mt-0.5">
+                  {shipment.mode || 'Not available'}
+                </span>
+              </div>
+
+              {/* Flight Number or Vessel / Voyage */}
+              {shipment.mode === 'Air' ? (
+                <div>
+                  <span className="text-[11px] font-medium text-slate-500 block">Flight Number</span>
+                  <span className="font-mono font-bold text-sky-800 text-xs block mt-0.5">
+                    {shipment.flightNumber || 'Not available'}
+                  </span>
+                  <span className="text-[10px] text-slate-500 block font-normal">
+                    Aircraft: {shipment.aircraftType || 'Not available'}
+                  </span>
+                </div>
+              ) : (
+                <div>
+                  <span className="text-[11px] font-medium text-slate-500 block">Vessel & Voyage</span>
+                  <span className="font-semibold text-teal-900 text-xs block mt-0.5 truncate" title={shipment.vesselName || ''}>
+                    {shipment.vesselName || 'Not available'}
+                  </span>
+                  <span className="text-[11px] font-mono text-slate-600 block">
+                    Voyage: {shipment.voyageNumber || 'Not available'}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
 

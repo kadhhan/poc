@@ -37,14 +37,21 @@ export interface Shipment {
   id: string; // e.g. 'SHP-88201'
   origin: LocationInfo;
   destination: LocationInfo;
-  carrier: string;
-  mode: TransportMode;
+  carrier: string; // Carrier Name (e.g., 'Saudia Cargo', 'Maersk Line')
+  carrierCode?: string; // Carrier Code (e.g., 'SV', 'MSK', 'QR', 'MSC')
+  mode: TransportMode; // 'Air' | 'Sea'
   etd: string; // Estimated Time of Departure (e.g., '2026-10-12 14:30')
   eta: string; // Estimated Time of Arrival (e.g., '2026-10-14 09:15')
   pieces: number;
   grossWeightKg: number;
   status: ShipmentStatus;
   
+  // Specific Carrier & Transport Fields
+  flightNumber?: string; // e.g. 'SV-982' for air shipments
+  aircraftType?: string; // e.g. 'B777-300F' for air shipments
+  vesselName?: string; // e.g. 'MSC Tessa' for sea shipments
+  voyageNumber?: string; // e.g. 'V.2410W' for sea shipments
+
   // Extended Details
   referenceType: 'AWB' | 'B/L';
   referenceNumber: string; // Master AWB or Ocean B/L number

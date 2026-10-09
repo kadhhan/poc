@@ -440,12 +440,27 @@ export const ShipmentTable: React.FC<ShipmentTableProps> = ({
                     </div>
                   </td>
 
-                  {/* Carrier & Flight/Vessel */}
+                  {/* Carrier & Flight/Vessel Details */}
                   <td className="py-3.5 px-4 whitespace-nowrap">
-                    <div className="font-semibold text-slate-800">{s.carrier}</div>
-                    <div className="text-[11px] text-slate-500 font-mono">
-                      {s.vesselOrFlight}
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-bold text-slate-900">{s.carrier || 'Not available'}</span>
+                      {s.carrierCode && (
+                        <span className="text-[10px] font-mono font-semibold px-1.5 py-0.2 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                          {s.carrierCode}
+                        </span>
+                      )}
                     </div>
+                    {isAirRow ? (
+                      <div className="text-[11px] text-slate-500 font-mono flex items-center gap-1">
+                        <span className="text-sky-700 font-semibold">{s.flightNumber ? `Flight ${s.flightNumber}` : s.vesselOrFlight || 'Not available'}</span>
+                        {s.aircraftType && <span className="text-slate-400">({s.aircraftType})</span>}
+                      </div>
+                    ) : (
+                      <div className="text-[11px] text-slate-500 font-mono">
+                        <span className="text-teal-800 font-medium">{s.vesselName || s.vesselOrFlight || 'Not available'}</span>
+                        {s.voyageNumber && <span className="text-slate-500 ml-1">· Voy {s.voyageNumber}</span>}
+                      </div>
+                    )}
                   </td>
 
                   {/* Mode column (only in ALL view) */}
@@ -595,13 +610,22 @@ export const ShipmentTable: React.FC<ShipmentTableProps> = ({
               <div className="grid grid-cols-2 gap-2 text-xs text-slate-600 bg-slate-50/50 p-2 rounded">
                 <div>
                   <span className="text-slate-400 block text-[10px]">
-                    {isAirRow ? 'Airline & Flight:' : 'Line & Vessel:'}
+                    {isAirRow ? 'Airline & Flight Number:' : 'Shipping Line & Vessel:'}
                   </span>
-                  <span className="font-medium text-slate-800 truncate block">
-                    {s.carrier}
-                  </span>
-                  <span className="font-mono text-[11px] text-slate-500 truncate block">
-                    {s.vesselOrFlight}
+                  <div className="flex items-center gap-1">
+                    <span className="font-bold text-slate-900 truncate">
+                      {s.carrier || 'Not available'}
+                    </span>
+                    {s.carrierCode && (
+                      <span className="text-[10px] font-mono px-1 py-0.2 rounded bg-slate-200 text-slate-700">
+                        {s.carrierCode}
+                      </span>
+                    )}
+                  </div>
+                  <span className="font-mono text-[11px] text-slate-600 truncate block">
+                    {isAirRow
+                      ? s.flightNumber ? `Flight ${s.flightNumber}` : s.vesselOrFlight || 'Not available'
+                      : s.vesselName ? `${s.vesselName} (Voy ${s.voyageNumber || 'N/A'})` : s.vesselOrFlight || 'Not available'}
                   </span>
                 </div>
                 <div>

@@ -20,16 +20,16 @@ const AIR_CARRIERS = [
 ];
 
 const SEA_CARRIERS = [
-  { name: 'Maersk Line', prefix: 'MAEU' },
-  { name: 'MSC', prefix: 'MSCU' },
-  { name: 'CMA CGM', prefix: 'CMAC' },
-  { name: 'Hapag-Lloyd', prefix: 'HLCU' },
-  { name: 'Ocean Network Express (ONE)', prefix: 'ONEY' },
-  { name: 'COSCO Shipping', prefix: 'COSU' },
-  { name: 'Evergreen Marine', prefix: 'EGLV' },
-  { name: 'Yang Ming', prefix: 'YMLU' },
-  { name: 'HMM', prefix: 'HDMU' },
-  { name: 'ZIM Integrated Shipping', prefix: 'ZIMU' },
+  { name: 'Maersk Line', prefix: 'MAEU', code: 'MSK' },
+  { name: 'MSC', prefix: 'MSCU', code: 'MSC' },
+  { name: 'CMA CGM', prefix: 'CMAC', code: 'CMA' },
+  { name: 'Hapag-Lloyd', prefix: 'HLCU', code: 'HLC' },
+  { name: 'Ocean Network Express (ONE)', prefix: 'ONEY', code: 'ONE' },
+  { name: 'COSCO Shipping', prefix: 'COSU', code: 'COS' },
+  { name: 'Evergreen Marine', prefix: 'EGLV', code: 'EMC' },
+  { name: 'Yang Ming', prefix: 'YMLU', code: 'YML' },
+  { name: 'HMM', prefix: 'HDMU', code: 'HMM' },
+  { name: 'ZIM Integrated Shipping', prefix: 'ZIMU', code: 'ZIM' },
 ];
 
 const COMMODITIES = [
@@ -308,6 +308,11 @@ export function createShipment(
   const eta = `2026-10-${etaDay} ${String(randomInt(4, 23)).padStart(2, '0')}:${String(randomInt(10, 50)).padStart(2, '0')}`;
 
   let carrierName = '';
+  let carrierCode = '';
+  let flightNumber: string | undefined = undefined;
+  let aircraftType: string | undefined = undefined;
+  let vesselName: string | undefined = undefined;
+  let voyageNumber: string | undefined = undefined;
   let refType: 'AWB' | 'B/L' = 'AWB';
   let refNumber = '';
   let vesselOrFlight = '';
@@ -318,18 +323,35 @@ export function createShipment(
   if (mode === 'Air') {
     const airCarrier = randomChoice(AIR_CARRIERS);
     carrierName = airCarrier.name;
+    carrierCode = airCarrier.code;
+    flightNumber = `${airCarrier.code}-${randomInt(100, 999)}`;
+    aircraftType = randomChoice(['Boeing 777-300F', 'Boeing 787-9', 'Airbus A350-900', 'Boeing 747-8F', 'Airbus A330-300']);
     refType = 'AWB';
     refNumber = `${airCarrier.prefix}-${randomInt(1000, 9999)}${randomInt(1000, 9999)}`;
-    vesselOrFlight = `${airCarrier.code} ${randomInt(100, 999)} (${randomChoice(['B777-300F', 'B787-9', 'A350-900', 'B747-8F', 'A330-300'])})`;
+    vesselOrFlight = `${flightNumber} (${aircraftType})`;
     pieces = randomInt(8, 150);
     grossWeightKg = randomInt(350, 6800);
     serviceLevel = randomChoice(['Priority Express Air', 'Pharma Direct (2-8°C)', 'Standard General Airfreight', 'Secure High-Value']);
   } else {
     const seaCarrier = randomChoice(SEA_CARRIERS);
     carrierName = seaCarrier.name;
+    carrierCode = seaCarrier.code;
+    vesselName = randomChoice([
+      'Maersk Mc-Kinney Moller',
+      'MSC Tessa',
+      'CMA CGM Jacques Saadé',
+      'ONE Apus',
+      'Ever Given',
+      'Hapag Berlin',
+      'MSC Oscar',
+      'COSCO Universe',
+      'Maersk Madrid',
+      'Yang Ming Winner'
+    ]);
+    voyageNumber = `V.${randomInt(100, 499)}${randomChoice(['W', 'E', 'N', 'S'])}`;
     refType = 'B/L';
     refNumber = `${seaCarrier.prefix}-${randomInt(10000000, 99999999)}`;
-    vesselOrFlight = `${randomChoice(['Maersk Mc-Kinney', 'MSC Tessa', 'CMA CGM Palais', 'ONE Apus', 'Ever Given', 'Hapag Berlin'])} / Voy ${randomInt(100, 499)}W`;
+    vesselOrFlight = `${vesselName} / Voy ${voyageNumber}`;
     pieces = randomInt(300, 2400);
     grossWeightKg = randomInt(11000, 26500);
     serviceLevel = randomChoice(['Ocean FCL Direct', 'Ocean Standard 40ft HQ', 'Ocean Reefer Direct', 'Ocean Consolidated LCL']);
@@ -372,6 +394,11 @@ export function createShipment(
     origin,
     destination,
     carrier: carrierName,
+    carrierCode,
+    flightNumber,
+    aircraftType,
+    vesselName,
+    voyageNumber,
     mode,
     etd,
     eta,

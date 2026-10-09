@@ -54,6 +54,11 @@ export function matchesKeyword(shipment: Shipment, keyword: string): boolean {
   if (shipment.id.toLowerCase().includes(q)) return true;
   if (shipment.referenceNumber.toLowerCase().includes(q)) return true;
   if (shipment.carrier.toLowerCase().includes(q)) return true;
+  if (shipment.carrierCode && shipment.carrierCode.toLowerCase().includes(q)) return true;
+  if (shipment.flightNumber && shipment.flightNumber.toLowerCase().includes(q)) return true;
+  if (shipment.vesselName && shipment.vesselName.toLowerCase().includes(q)) return true;
+  if (shipment.voyageNumber && shipment.voyageNumber.toLowerCase().includes(q)) return true;
+  if (shipment.aircraftType && shipment.aircraftType.toLowerCase().includes(q)) return true;
   if (shipment.cargoDescription.toLowerCase().includes(q)) return true;
   if (shipment.vesselOrFlight.toLowerCase().includes(q)) return true;
   if (shipment.containerOrPackageType.toLowerCase().includes(q)) return true;
@@ -231,8 +236,12 @@ export function exportShipmentsToCSV(shipments: Shipment[], filename = 'shipment
     'Destination Country',
     'Destination Airport',
     'Destination Seaport',
-    'Carrier',
+    'Carrier Name',
+    'Carrier Code',
     'Transport Mode',
+    'Flight Number',
+    'Vessel Name',
+    'Voyage Number',
     'Vessel or Flight',
     'ETD',
     'ETA',
@@ -267,9 +276,13 @@ export function exportShipmentsToCSV(shipments: Shipment[], filename = 'shipment
     s.destination.country,
     s.destination.airportName || '',
     s.destination.seaportName || '',
-    s.carrier,
+    s.carrier || 'Not available',
+    s.carrierCode || 'Not available',
     s.mode,
-    s.vesselOrFlight,
+    s.flightNumber || 'Not available',
+    s.vesselName || 'Not available',
+    s.voyageNumber || 'Not available',
+    s.vesselOrFlight || 'Not available',
     s.etd,
     s.eta,
     s.pieces,

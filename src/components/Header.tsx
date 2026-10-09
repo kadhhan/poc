@@ -1,5 +1,6 @@
 import React from 'react';
-import { Compass, HelpCircle, FileSpreadsheet, Sparkles, Play } from 'lucide-react';
+import { HelpCircle, FileSpreadsheet, Sparkles, Play } from 'lucide-react';
+import { HmdLogo } from './HmdLogo';
 
 interface HeaderProps {
   onOpenGuide: () => void;
@@ -23,9 +24,9 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo & Title: HMD Global Shipments */}
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-lg bg-slate-900 text-cyan-400 flex items-center justify-center shadow-sm border border-slate-700">
-              <Compass className="w-5 h-5 animate-[spin_40s_linear_infinite]" />
+          <div className="flex items-center space-x-3.5">
+            <div className="flex items-center justify-center p-2 px-2.5 bg-slate-900 rounded-lg shadow-sm border border-slate-800 hover:border-slate-700 transition-colors">
+              <HmdLogo className="h-6 w-auto" />
             </div>
             <div>
               <div className="flex items-center gap-2">

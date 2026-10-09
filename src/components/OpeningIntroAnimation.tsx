@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { FastForward, Compass, Zap } from 'lucide-react';
+import { FastForward, Zap } from 'lucide-react';
+import { HmdLogo } from './HmdLogo';
 
 interface OpeningIntroAnimationProps {
   onComplete: () => void;
@@ -452,11 +453,11 @@ export const OpeningIntroAnimation: React.FC<OpeningIntroAnimationProps> = ({ on
               : 'opacity-100 translate-y-0 scale-100 blur-0'
           }`}
         >
-          {/* Neon Emblem Icon */}
-          <div className="inline-flex items-center justify-center mb-5 relative">
-            <div className="w-18 h-18 sm:w-22 sm:h-22 rounded-2xl bg-gradient-to-tr from-cyan-400 via-fuchsia-500 to-emerald-400 p-[2px] shadow-[0_0_50px_rgba(0,245,255,0.8),0_0_80px_rgba(255,0,127,0.4)]">
-              <div className="w-full h-full bg-[#050914] rounded-2xl flex items-center justify-center border border-cyan-400/40">
-                <Compass className="w-9 h-9 sm:w-12 sm:h-12 text-cyan-300 animate-[spin_20s_linear_infinite] drop-shadow-[0_0_12px_#00f5ff]" />
+          {/* Neon Emblem Icon - Official HMD Brand Logo */}
+          <div className="inline-flex items-center justify-center mb-6 relative">
+            <div className="px-6 py-3.5 sm:px-8 sm:py-4.5 rounded-2xl bg-gradient-to-tr from-cyan-400 via-fuchsia-500 to-emerald-400 p-[2px] shadow-[0_0_50px_rgba(0,245,255,0.8),0_0_80px_rgba(255,0,127,0.4)]">
+              <div className="w-full h-full bg-[#050914] rounded-2xl flex items-center justify-center px-4 py-2 border border-cyan-400/40">
+                <HmdLogo className="h-10 sm:h-14 w-auto drop-shadow-[0_0_16px_rgba(71,215,172,0.8)]" glow />
               </div>
             </div>
             {/* Pulsing Neon Halo Rings */}

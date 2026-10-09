@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, RotateCcw, ArrowRightLeft, Filter, Plane, Ship, Globe, Anchor } from 'lucide-react';
+import { Search, RotateCcw, ArrowRightLeft, Filter, Plane, Ship, Globe, Anchor, Building } from 'lucide-react';
 import { SearchFilterState, Shipment } from '../types/shipment';
 import { LocationSearchInput } from './LocationSearchInput';
 
@@ -183,20 +183,32 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
         </div>
       </div>
 
-      {/* 2. SEARCHABLE FROM & TO ROUTE SEARCH */}
+      {/* 2. SEARCHABLE FROM, TO & CARRIER SEARCH */}
       <form onSubmit={handleSearchSubmit}>
         <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
-          {/* Origin (From) - Searchable Manual Place Input */}
-          <div className="md:col-span-4">
+          {/* Origin (From) */}
+          <div className="md:col-span-3">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-[11px] font-semibold text-slate-700 uppercase">
+                {localFilters.mode === 'Air'
+                  ? 'Origin Airport'
+                  : localFilters.mode === 'Sea'
+                  ? 'Origin Seaport'
+                  : 'Origin (From)'}
+              </span>
+              <button
+                type="button"
+                onClick={handleSwapLocations}
+                title="Swap Origin and Destination"
+                className="text-slate-400 hover:text-blue-600 inline-flex items-center gap-0.5 text-[10px] cursor-pointer font-medium"
+              >
+                <ArrowRightLeft className="w-2.5 h-2.5" />
+                <span>Swap</span>
+              </button>
+            </div>
             <LocationSearchInput
               id="from-location"
-              label={
-                localFilters.mode === 'Air'
-                  ? 'Origin Airport (From)'
-                  : localFilters.mode === 'Sea'
-                  ? 'Origin Seaport (From)'
-                  : 'Origin (From)'
-              }
+              label=""
               type="origin"
               mode={localFilters.mode as any}
               iconColor={
@@ -208,10 +220,10 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
               }
               placeholder={
                 localFilters.mode === 'Air'
-                  ? 'Type airport name or IATA code (e.g. BOM, LHR, JFK)...'
+                  ? 'Airport / IATA (e.g. BOM, LHR)...'
                   : localFilters.mode === 'Sea'
-                  ? 'Type seaport name or code (e.g. Jebel Ali, JNPT, Rotterdam)...'
-                  : 'Type city, airport code, or seaport...'
+                  ? 'Seaport / code (e.g. JNPT, Rotterdam)...'
+                  : 'City, airport, or seaport...'
               }
               value={localFilters.fromLocation}
               shipments={shipments}
@@ -221,39 +233,29 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
             />
           </div>
 
-          {/* Swap Button (between From & To) */}
-          <div className="md:col-span-1 flex justify-center pb-0.5">
-            <button
-              type="button"
-              onClick={handleSwapLocations}
-              title="Swap Origin and Destination"
-              aria-label="Swap Origin and Destination"
-              className="p-2 border border-slate-200 rounded-md text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors active:scale-95 cursor-pointer"
-            >
-              <ArrowRightLeft className="w-4 h-4" />
-            </button>
-          </div>
-
-          {/* Destination (To) - Searchable Manual Place Input */}
-          <div className="md:col-span-4">
+          {/* Destination (To) */}
+          <div className="md:col-span-3">
+            <div className="mb-1">
+              <span className="text-[11px] font-semibold text-slate-700 uppercase">
+                {localFilters.mode === 'Air'
+                  ? 'Destination Airport'
+                  : localFilters.mode === 'Sea'
+                  ? 'Destination Seaport'
+                  : 'Destination (To)'}
+              </span>
+            </div>
             <LocationSearchInput
               id="to-location"
-              label={
-                localFilters.mode === 'Air'
-                  ? 'Destination Airport (To)'
-                  : localFilters.mode === 'Sea'
-                  ? 'Destination Seaport (To)'
-                  : 'Destination (To)'
-              }
+              label=""
               type="destination"
               mode={localFilters.mode as any}
               iconColor="text-red-500"
               placeholder={
                 localFilters.mode === 'Air'
-                  ? 'Type airport name or IATA code (e.g. JED, DXB, LHR)...'
+                  ? 'Airport / IATA (e.g. JED, DXB)...'
                   : localFilters.mode === 'Sea'
-                  ? 'Type seaport name or code (e.g. Jeddah Islamic, Singapore)...'
-                  : 'Type destination city, airport, or seaport...'
+                  ? 'Seaport / code (e.g. Jeddah, Singapore)...'
+                  : 'Destination city, port...'
               }
               value={localFilters.toLocation}
               shipments={shipments}
@@ -263,11 +265,68 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
             />
           </div>
 
+          {/* Dedicated Carrier Filter (Airline / Shipping Line) */}
+          <div className="md:col-span-3">
+            <div className="flex items-center justify-between mb-1">
+              <label
+                htmlFor="primary-carrier-filter"
+                className="text-[11px] font-semibold text-slate-700 uppercase flex items-center gap-1"
+              >
+                {localFilters.mode === 'Air' ? (
+                  <Plane className="w-3 h-3 text-sky-600" />
+                ) : localFilters.mode === 'Sea' ? (
+                  <Ship className="w-3 h-3 text-teal-700" />
+                ) : (
+                  <Building className="w-3 h-3 text-blue-600" />
+                )}
+                <span>
+                  {localFilters.mode === 'Air'
+                    ? 'Airline Carrier'
+                    : localFilters.mode === 'Sea'
+                    ? 'Ocean Shipping Line'
+                    : 'Carrier'}
+                </span>
+              </label>
+              {localFilters.carrier !== 'ALL' && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const updated = { ...localFilters, carrier: 'ALL' };
+                    setLocalFilters(updated);
+                    onApplyFilters(updated);
+                  }}
+                  className="text-[10px] text-blue-600 hover:underline cursor-pointer lowercase"
+                >
+                  clear
+                </button>
+              )}
+            </div>
+            <select
+              id="primary-carrier-filter"
+              value={localFilters.carrier}
+              onChange={(e) => {
+                const updated = { ...localFilters, carrier: e.target.value };
+                setLocalFilters(updated);
+                onApplyFilters(updated);
+              }}
+              className="w-full bg-white border border-slate-300 rounded-md py-2 px-2.5 text-xs text-slate-800 font-medium focus:outline-hidden focus:ring-1 focus:ring-blue-500 shadow-2xs cursor-pointer h-[38px]"
+            >
+              <option value="ALL">
+                All {localFilters.mode === 'Air' ? 'Airlines' : localFilters.mode === 'Sea' ? 'Shipping Lines' : 'Carriers'} ({filteredCarriers.length})
+              </option>
+              {filteredCarriers.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
+          </div>
+
           {/* Action Buttons: Search & Reset */}
           <div className="md:col-span-3 flex items-center gap-2">
             <button
               type="submit"
-              className={`flex-1 inline-flex items-center justify-center gap-2 text-white font-medium text-sm py-2 px-4 rounded-md shadow-xs transition-colors focus:outline-hidden focus:ring-2 cursor-pointer ${
+              className={`flex-1 inline-flex items-center justify-center gap-2 text-white font-medium text-sm py-2 px-4 rounded-md shadow-xs transition-colors focus:outline-hidden focus:ring-2 cursor-pointer h-[38px] ${
                 localFilters.mode === 'Air'
                   ? 'bg-sky-600 hover:bg-sky-700 active:bg-sky-800 focus:ring-sky-500'
                   : localFilters.mode === 'Sea'
@@ -288,7 +347,7 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
             <button
               type="button"
               onClick={handleResetClick}
-              className="inline-flex items-center justify-center gap-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 font-medium text-sm py-2 px-3 rounded-md transition-colors active:bg-slate-200 cursor-pointer"
+              className="inline-flex items-center justify-center gap-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 font-medium text-sm py-2 px-3 rounded-md transition-colors active:bg-slate-200 cursor-pointer h-[38px]"
               title="Reset all filters to default"
             >
               <RotateCcw className="w-4 h-4 text-slate-500" />
@@ -393,7 +452,7 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
 
       {/* 4. ADVANCED FILTER STRIP */}
       {showAdvanced && (
-        <div className="pt-3 border-t border-slate-200/80 grid grid-cols-1 sm:grid-cols-3 gap-3 bg-slate-50/60 p-3 rounded-md">
+        <div className="pt-3 border-t border-slate-200/80 grid grid-cols-1 sm:grid-cols-2 gap-3 bg-slate-50/60 p-3 rounded-md">
           {/* Status Filter */}
           <div>
             <label
@@ -410,7 +469,7 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
                 setLocalFilters(updated);
                 onApplyFilters(updated);
               }}
-              className="w-full bg-white border border-slate-300 rounded-md py-1.5 px-2.5 text-xs text-slate-800 focus:outline-hidden focus:ring-1 focus:ring-blue-500"
+              className="w-full bg-white border border-slate-300 rounded-md py-2 px-2.5 text-xs text-slate-800 focus:outline-hidden focus:ring-1 focus:ring-blue-500 shadow-2xs"
             >
               <option value="ALL">All Statuses</option>
               <option value="Booked">Booked</option>
@@ -420,50 +479,17 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
             </select>
           </div>
 
-          {/* Carrier Filter (Airlines / Shipping Lines based on Mode) */}
-          <div>
-            <label
-              htmlFor="carrier-filter"
-              className="block text-[11px] font-semibold text-slate-600 uppercase mb-1"
-            >
-              {localFilters.mode === 'Air'
-                ? 'Airline Carrier'
-                : localFilters.mode === 'Sea'
-                ? 'Ocean Shipping Line'
-                : 'Carrier (Airline / Ocean Line)'}
-            </label>
-            <select
-              id="carrier-filter"
-              value={localFilters.carrier}
-              onChange={(e) => {
-                const updated = { ...localFilters, carrier: e.target.value };
-                setLocalFilters(updated);
-                onApplyFilters(updated);
-              }}
-              className="w-full bg-white border border-slate-300 rounded-md py-1.5 px-2.5 text-xs text-slate-800 focus:outline-hidden focus:ring-1 focus:ring-blue-500"
-            >
-              <option value="ALL">
-                All {localFilters.mode === 'Air' ? 'Airlines' : localFilters.mode === 'Sea' ? 'Shipping Lines' : 'Carriers'} ({filteredCarriers.length})
-              </option>
-              {filteredCarriers.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Keyword Search */}
+          {/* Search by Carrier Name, Code, Flight #, Vessel, AWB/BL */}
           <div>
             <label
               htmlFor="keyword-search"
               className="block text-[11px] font-semibold text-slate-600 uppercase mb-1"
             >
               {localFilters.mode === 'Air'
-                ? 'Search AWB / Flight # / Air Cargo'
+                ? 'Search Carrier / Code / Flight # / AWB'
                 : localFilters.mode === 'Sea'
-                ? 'Search B/L / Vessel / Container #'
-                : 'Keyword / ID / AWB / BL / Cargo'}
+                ? 'Search Line / Code / Vessel / B/L'
+                : 'Search Carrier, Code, Flight, Vessel, AWB / B/L'}
             </label>
             <div className="relative">
               <input
@@ -471,10 +497,10 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
                 type="text"
                 placeholder={
                   localFilters.mode === 'Air'
-                    ? 'e.g. 065-49120931, SV 981, Boeing...'
+                    ? 'e.g. Saudia, SV, SV-982, Qatar, 065-...'
                     : localFilters.mode === 'Sea'
-                    ? 'e.g. MAEU-849204812, MSKU9021482...'
-                    : 'e.g. SHP-10101, AWB, micro...'
+                    ? 'e.g. Maersk, MSK, MSC Tessa, CMA, MAEU-...'
+                    : 'e.g. Saudia, Maersk, SV, MSC, SV-982, SHP-...'
                 }
                 value={localFilters.keyword}
                 onChange={(e) => {
@@ -482,7 +508,7 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
                   setLocalFilters(updated);
                   onApplyFilters(updated);
                 }}
-                className="w-full bg-white border border-slate-300 rounded-md py-1.5 px-2.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-1 focus:ring-blue-500"
+                className="w-full bg-white border border-slate-300 rounded-md py-2 px-2.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-1 focus:ring-blue-500 shadow-2xs"
               />
             </div>
           </div>
