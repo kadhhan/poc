@@ -11,6 +11,7 @@ import { ShipmentTable } from './components/ShipmentTable';
 import { ShipmentDetailModal } from './components/ShipmentDetailModal';
 import { EmptyState } from './components/EmptyState';
 import { HowToGuideModal } from './components/HowToGuideModal';
+import { OpeningIntroAnimation } from './components/OpeningIntroAnimation';
 import { INITIAL_SHIPMENTS } from './data/shipments';
 import { WORLD_LOCATIONS } from './data/globalLocations';
 import { SearchFilterState, Shipment } from './types/shipment';
@@ -21,6 +22,28 @@ import {
 } from './utils/dummyDataGenerator';
 
 export default function App() {
+  // Opening Intro Animation state (only on initial website load per session)
+  const [showIntro, setShowIntro] = useState<boolean>(() => {
+    try {
+      return !sessionStorage.getItem('hmd_intro_viewed');
+    } catch {
+      return true;
+    }
+  });
+
+  const handleIntroComplete = () => {
+    try {
+      sessionStorage.setItem('hmd_intro_viewed', 'true');
+    } catch {
+      // ignore
+    }
+    setShowIntro(false);
+  };
+
+  const handleReplayIntro = () => {
+    setShowIntro(true);
+  };
+
   // Dynamic shipment database state (initialized with 130+ baseline global shipments)
   const [shipmentsList, setShipmentsList] = useState<Shipment[]>(INITIAL_SHIPMENTS);
 
@@ -139,11 +162,17 @@ export default function App() {
         </div>
       )}
 
+      {/* Full-Screen Opening Cinematic Intro Animation */}
+      {showIntro && (
+        <OpeningIntroAnimation onComplete={handleIntroComplete} />
+      )}
+
       {/* Top Application Navbar */}
       <Header
         onOpenGuide={() => setIsGuideOpen(true)}
         onExportCSV={handleExportCSV}
         onGenerateMore={handleGenerateMoreGlobal}
+        onReplayIntro={handleReplayIntro}
         shipmentCount={filteredShipments.length}
         totalCatalogCount={shipmentsList.length}
       />

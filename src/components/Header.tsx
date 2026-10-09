@@ -1,10 +1,11 @@
 import React from 'react';
-import { Package, HelpCircle, FileSpreadsheet, Sparkles } from 'lucide-react';
+import { Compass, HelpCircle, FileSpreadsheet, Sparkles, Play } from 'lucide-react';
 
 interface HeaderProps {
   onOpenGuide: () => void;
   onExportCSV: () => void;
   onGenerateMore: () => void;
+  onReplayIntro?: () => void;
   shipmentCount: number;
   totalCatalogCount: number;
 }
@@ -13,6 +14,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenGuide,
   onExportCSV,
   onGenerateMore,
+  onReplayIntro,
   shipmentCount,
   totalCatalogCount,
 }) => {
@@ -20,28 +22,39 @@ export const Header: React.FC<HeaderProps> = ({
     <header className="border-b border-slate-200 bg-white sticky top-0 z-20 shadow-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo & Title */}
+          {/* Logo & Title: HMD Global Shipments */}
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-lg bg-blue-600 text-white flex items-center justify-center shadow-sm">
-              <Package className="w-5 h-5" />
+            <div className="w-10 h-10 rounded-lg bg-slate-900 text-cyan-400 flex items-center justify-center shadow-sm border border-slate-700">
+              <Compass className="w-5 h-5 animate-[spin_40s_linear_infinite]" />
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-lg font-bold text-slate-900 tracking-tight leading-tight">
-                  Shipment Explorer
+                  HMD Global Shipments
                 </h1>
                 <span className="text-[11px] font-medium tracking-wide uppercase px-2 py-0.5 bg-blue-50 text-blue-700 border border-blue-200/60 rounded">
-                  Worldwide POC · {totalCatalogCount} records
+                  {totalCatalogCount} global records
                 </span>
               </div>
               <p className="text-xs text-slate-500 font-normal">
-                Search and track shipment records.
+                Connecting the World, One Shipment at a Time.
               </p>
             </div>
           </div>
 
           {/* Right Action Controls */}
           <div className="flex items-center space-x-2 sm:space-x-3">
+            {onReplayIntro && (
+              <button
+                onClick={onReplayIntro}
+                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-md border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 transition-colors cursor-pointer"
+                title="Replay cinematic opening animation"
+              >
+                <Play className="w-3.5 h-3.5 text-cyan-600 fill-cyan-600" />
+                <span className="hidden sm:inline">Replay Intro</span>
+              </button>
+            )}
+
             <button
               onClick={onGenerateMore}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-md bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100 transition-colors shadow-2xs cursor-pointer"
