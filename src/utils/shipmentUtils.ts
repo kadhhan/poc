@@ -16,16 +16,24 @@ export function filterShipments(
   filters: SearchFilterState
 ): Shipment[] {
   return shipments.filter((shipment) => {
-    // 1. Origin Filter
-    if (filters.fromLocation && filters.fromLocation !== 'ALL') {
-      if (shipment.origin.city.toLowerCase() !== filters.fromLocation.toLowerCase()) {
+    // 1. Origin Filter (supports manual city name, code, or country)
+    if (filters.fromLocation && filters.fromLocation !== 'ALL' && filters.fromLocation.trim() !== '') {
+      const qFrom = filters.fromLocation.trim().toLowerCase();
+      const matchCity = shipment.origin.city.toLowerCase().includes(qFrom);
+      const matchCode = shipment.origin.code.toLowerCase().includes(qFrom);
+      const matchCountry = shipment.origin.country.toLowerCase().includes(qFrom);
+      if (!matchCity && !matchCode && !matchCountry) {
         return false;
       }
     }
 
-    // 2. Destination Filter
-    if (filters.toLocation && filters.toLocation !== 'ALL') {
-      if (shipment.destination.city.toLowerCase() !== filters.toLocation.toLowerCase()) {
+    // 2. Destination Filter (supports manual city name, code, or country)
+    if (filters.toLocation && filters.toLocation !== 'ALL' && filters.toLocation.trim() !== '') {
+      const qTo = filters.toLocation.trim().toLowerCase();
+      const matchCity = shipment.destination.city.toLowerCase().includes(qTo);
+      const matchCode = shipment.destination.code.toLowerCase().includes(qTo);
+      const matchCountry = shipment.destination.country.toLowerCase().includes(qTo);
+      if (!matchCity && !matchCode && !matchCountry) {
         return false;
       }
     }

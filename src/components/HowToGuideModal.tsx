@@ -87,19 +87,22 @@ export const HowToGuideModal: React.FC<HowToGuideModalProps> = ({ isOpen, onClos
                 </p>
                 <ul className="list-disc pl-5 mt-2 space-y-1.5">
                   <li>
+                    <strong>Manual Place Name Search:</strong> Type any city name (e.g. <em>Mumbai</em>, <em>Jeddah</em>, <em>Bangkok</em>) or IATA/ICAO port code (e.g. <em>BOM</em>, <em>JED</em>, <em>DXB</em>) manually, or select from the live suggestions list.
+                  </li>
+                  <li>
                     <strong>From + To:</strong> Returns only shipments matching both origin and destination (e.g. <em>Mumbai → Jeddah</em>).
                   </li>
                   <li>
-                    <strong>From only:</strong> Filters by origin city regardless of where the shipment lands.
+                    <strong>From only:</strong> Filters by origin city/code regardless of destination.
                   </li>
                   <li>
-                    <strong>To only:</strong> Filters by destination city regardless of origin point.
+                    <strong>To only:</strong> Filters by destination city/code regardless of origin point.
                   </li>
                   <li>
                     <strong>Empty locations:</strong> Displays all available global shipments across the dummy dataset.
                   </li>
                   <li>
-                    <strong>Empty Result Handling:</strong> Try selecting <em>Tokyo → Jeddah</em> to observe the structured empty state with route recovery suggestions.
+                    <strong>Empty Result Handling:</strong> Try selecting <em>Tokyo → Jeddah</em> or typing an unserved location to observe the structured empty state with route recovery suggestions.
                   </li>
                 </ul>
               </div>

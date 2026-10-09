@@ -9,8 +9,9 @@ interface EmptyStateProps {
 }
 
 export const EmptyState: React.FC<EmptyStateProps> = ({ filters, onReset, onSelectRoute }) => {
-  const isSpecificRoute =
-    filters.fromLocation !== 'ALL' || filters.toLocation !== 'ALL';
+  const hasFrom = filters.fromLocation && filters.fromLocation !== 'ALL' && filters.fromLocation.trim() !== '';
+  const hasTo = filters.toLocation && filters.toLocation !== 'ALL' && filters.toLocation.trim() !== '';
+  const isSpecificRoute = hasFrom || hasTo;
 
   return (
     <div className="bg-white border border-slate-200 rounded-lg p-8 sm:p-12 text-center max-w-2xl mx-auto shadow-2xs">
@@ -27,11 +28,11 @@ export const EmptyState: React.FC<EmptyStateProps> = ({ filters, onReset, onSele
           <span>
             No scheduled or active shipments currently found between{' '}
             <strong className="text-slate-800">
-              {filters.fromLocation === 'ALL' ? 'Any Origin' : filters.fromLocation}
+              {hasFrom ? filters.fromLocation : 'Any Origin'}
             </strong>{' '}
             and{' '}
             <strong className="text-slate-800">
-              {filters.toLocation === 'ALL' ? 'Any Destination' : filters.toLocation}
+              {hasTo ? filters.toLocation : 'Any Destination'}
             </strong>{' '}
             under the selected criteria.
           </span>

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Search, RotateCcw, ArrowRightLeft, Filter, Plane, Ship, Building2, MapPin } from 'lucide-react';
+import { Search, RotateCcw, ArrowRightLeft, Filter, Plane, Ship } from 'lucide-react';
 import { SearchFilterState } from '../types/shipment';
-import { LOCATIONS_CATALOG } from '../data/shipments';
+import { LocationSearchInput } from './LocationSearchInput';
 
 interface SearchFiltersProps {
   filters: SearchFilterState;
@@ -66,47 +66,24 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
     onApplyFilters(updated);
   };
 
-  const hasActiveFilters =
-    localFilters.fromLocation !== 'ALL' ||
-    localFilters.toLocation !== 'ALL' ||
-    localFilters.mode !== 'ALL' ||
-    localFilters.status !== 'ALL' ||
-    localFilters.carrier !== 'ALL' ||
-    localFilters.keyword.trim() !== '';
-
   return (
     <div className="bg-white border border-slate-200 rounded-lg shadow-2xs p-4 sm:p-5 space-y-4">
-      {/* Route Search Primary Section */}
+      {/* Route Search Primary Section with Manual Place Name Search */}
       <form onSubmit={handleSearchSubmit}>
         <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
-          {/* Origin (From) */}
+          {/* Origin (From) - Searchable Manual Place Input */}
           <div className="md:col-span-4">
-            <label
-              htmlFor="from-location"
-              className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5"
-            >
-              <span className="flex items-center gap-1.5">
-                <MapPin className="w-3.5 h-3.5 text-blue-600" />
-                Origin (From)
-              </span>
-            </label>
-            <div className="relative">
-              <select
-                id="from-location"
-                value={localFilters.fromLocation}
-                onChange={(e) =>
-                  setLocalFilters((prev) => ({ ...prev, fromLocation: e.target.value }))
-                }
-                className="w-full bg-slate-50 border border-slate-300 rounded-md py-2 px-3 text-sm text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-              >
-                <option value="ALL">All Origins (Any Location)</option>
-                {LOCATIONS_CATALOG.map((loc) => (
-                  <option key={`from-${loc.code}`} value={loc.city}>
-                    {loc.city} ({loc.code}) — {loc.country}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <LocationSearchInput
+              id="from-location"
+              label="Origin (From)"
+              type="origin"
+              iconColor="text-blue-600"
+              placeholder="Type origin city (e.g. Mumbai, BOM...)"
+              value={localFilters.fromLocation}
+              onChange={(val) => {
+                setLocalFilters((prev) => ({ ...prev, fromLocation: val }));
+              }}
+            />
           </div>
 
           {/* Swap Button (between From & To) */}
@@ -122,41 +99,26 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
             </button>
           </div>
 
-          {/* Destination (To) */}
+          {/* Destination (To) - Searchable Manual Place Input */}
           <div className="md:col-span-4">
-            <label
-              htmlFor="to-location"
-              className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5"
-            >
-              <span className="flex items-center gap-1.5">
-                <MapPin className="w-3.5 h-3.5 text-red-500" />
-                Destination (To)
-              </span>
-            </label>
-            <div className="relative">
-              <select
-                id="to-location"
-                value={localFilters.toLocation}
-                onChange={(e) =>
-                  setLocalFilters((prev) => ({ ...prev, toLocation: e.target.value }))
-                }
-                className="w-full bg-slate-50 border border-slate-300 rounded-md py-2 px-3 text-sm text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-              >
-                <option value="ALL">All Destinations (Any Location)</option>
-                {LOCATIONS_CATALOG.map((loc) => (
-                  <option key={`to-${loc.code}`} value={loc.city}>
-                    {loc.city} ({loc.code}) — {loc.country}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <LocationSearchInput
+              id="to-location"
+              label="Destination (To)"
+              type="destination"
+              iconColor="text-red-500"
+              placeholder="Type destination city (e.g. Jeddah, JED...)"
+              value={localFilters.toLocation}
+              onChange={(val) => {
+                setLocalFilters((prev) => ({ ...prev, toLocation: val }));
+              }}
+            />
           </div>
 
           {/* Action Buttons: Search & Reset */}
           <div className="md:col-span-3 flex items-center gap-2">
             <button
               type="submit"
-              className="flex-1 inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm py-2 px-4 rounded-md shadow-xs transition-colors active:bg-blue-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
+              className="flex-1 inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm py-2 px-4 rounded-md shadow-xs transition-colors active:bg-blue-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 cursor-pointer"
             >
               <Search className="w-4 h-4" />
               <span>Search</span>
@@ -165,7 +127,7 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
             <button
               type="button"
               onClick={handleResetClick}
-              className="inline-flex items-center justify-center gap-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 font-medium text-sm py-2 px-3 rounded-md transition-colors active:bg-slate-200"
+              className="inline-flex items-center justify-center gap-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 font-medium text-sm py-2 px-3 rounded-md transition-colors active:bg-slate-200 cursor-pointer"
               title="Reset all filters to default"
             >
               <RotateCcw className="w-4 h-4 text-slate-500" />
