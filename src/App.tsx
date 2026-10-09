@@ -15,7 +15,12 @@ import { OpeningIntroAnimation } from './components/OpeningIntroAnimation';
 import { INITIAL_SHIPMENTS } from './data/shipments';
 import { WORLD_LOCATIONS } from './data/globalLocations';
 import { SearchFilterState, Shipment } from './types/shipment';
-import { filterShipments, calculateSummary, exportShipmentsToCSV } from './utils/shipmentUtils';
+import {
+  calculateSummary,
+  exportShipmentsToCSV,
+  searchShipmentsWithAlternatives,
+  filterShipments,
+} from './utils/shipmentUtils';
 import {
   createShipment,
   generateShipmentsForSpecificRoute,
@@ -44,7 +49,7 @@ export default function App() {
     setShowIntro(true);
   };
 
-  // Dynamic shipment database state (initialized with 130+ baseline global shipments)
+  // Dynamic shipment database state (initialized with 320+ baseline global shipments)
   const [shipmentsList, setShipmentsList] = useState<Shipment[]>(INITIAL_SHIPMENTS);
 
   // Global filter state
@@ -73,6 +78,34 @@ export default function App() {
     }, 3500);
   };
 
+  // Automatically guarantee at least 6 authentic direct shipments for any selected route pair
+  React.useEffect(() => {
+    const hasFrom = filters.fromLocation && filters.fromLocation !== 'ALL' && filters.fromLocation.trim() !== '';
+    const hasTo = filters.toLocation && filters.toLocation !== 'ALL' && filters.toLocation.trim() !== '';
+
+    if (hasFrom && hasTo) {
+      const directMatches = filterShipments(shipmentsList, {
+        fromLocation: filters.fromLocation,
+        toLocation: filters.toLocation,
+        mode: 'ALL',
+        carrier: 'ALL',
+        status: 'ALL',
+        keyword: '',
+      });
+
+      if (directMatches.length < 6) {
+        const needed = 6 - directMatches.length;
+        const newShipments = generateShipmentsForSpecificRoute(
+          filters.fromLocation,
+          filters.toLocation,
+          shipmentsList.length,
+          needed
+        );
+        setShipmentsList((prev) => [...newShipments, ...prev]);
+      }
+    }
+  }, [filters.fromLocation, filters.toLocation]);
+
   // List of all distinct carriers from active dataset
   const availableCarriers = useMemo(() => {
     const set = new Set<string>();
@@ -80,10 +113,12 @@ export default function App() {
     return Array.from(set).sort();
   }, [shipmentsList]);
 
-  // Filtered shipments based on current active filters
-  const filteredShipments = useMemo(() => {
-    return filterShipments(shipmentsList, filters);
+  // Search results
+  const searchResult = useMemo(() => {
+    return searchShipmentsWithAlternatives(shipmentsList, filters);
   }, [shipmentsList, filters]);
+
+  const filteredShipments = searchResult.combinedResults;
 
   // Dynamic summary stats calculated reactively from filtered results
   const summary = useMemo(() => {
@@ -117,11 +152,11 @@ export default function App() {
     });
   };
 
-  // Generate 20 more random global shipments across worldwide ports
+  // Generate 25 more random global shipments across worldwide ports
   const handleGenerateMoreGlobal = () => {
     const newRecords: Shipment[] = [];
-    const count = 20;
-    const startId = 30000 + shipmentsList.length;
+    const count = 25;
+    const startId = 40000 + shipmentsList.length;
 
     for (let i = 0; i < count; i++) {
       const origIdx = Math.floor(Math.random() * WORLD_LOCATIONS.length);
@@ -139,7 +174,7 @@ export default function App() {
     }
 
     setShipmentsList((prev) => [...prev, ...newRecords]);
-    showToast(`✨ Generated 20 new realistic global shipments (Total: ${shipmentsList.length + count})`);
+    showToast(`✨ Generated 25 new realistic global shipments (Total: ${shipmentsList.length + count})`);
   };
 
   // Generate shipments specifically for a requested route (on-demand route synthesizer)
@@ -150,7 +185,7 @@ export default function App() {
   };
 
   const handleExportCSV = () => {
-    exportShipmentsToCSV(filteredShipments, `shipments-${new Date().toISOString().split('T')[0]}.csv`);
+    exportShipmentsToCSV(filteredShipments, `hmd-shipments-${new Date().toISOString().split('T')[0]}.csv`);
   };
 
   return (
@@ -195,12 +230,20 @@ export default function App() {
           <SummaryCards summary={summary} />
         </section>
 
-        {/* Shipment Results Section */}
-        <section aria-label="Shipment Results">
+        {/* Shipment Results Table */}
+        <section aria-label="Shipment Results Table">
           {filteredShipments.length > 0 ? (
             <ShipmentTable
               shipments={filteredShipments}
               onSelectShipment={(shipment) => setSelectedShipment(shipment)}
+              activeMode={filters.mode}
+              onModeChange={(m) => {
+                const nextFilters = { ...filters, mode: m, carrier: 'ALL' };
+                setFilters(nextFilters);
+              }}
+              totalAllCount={shipmentsList.length}
+              totalAirCount={shipmentsList.filter((s) => s.mode === 'Air').length}
+              totalSeaCount={shipmentsList.filter((s) => s.mode === 'Sea').length}
             />
           ) : (
             <EmptyState
@@ -217,16 +260,16 @@ export default function App() {
       <footer className="border-t border-slate-200 bg-white py-4 mt-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2">
           <div className="flex items-center gap-2">
-            <span className="font-semibold text-slate-700">Shipment Explorer POC</span>
+            <span className="font-semibold text-slate-700">HMD Global Shipments</span>
             <span>·</span>
-            <span>Global Transport & Freight Management System</span>
+            <span>Connecting the World, One Shipment at a Time.</span>
           </div>
           <div className="flex items-center gap-4">
             <button
               onClick={handleGenerateMoreGlobal}
               className="text-indigo-600 hover:underline font-medium cursor-pointer"
             >
-              + Generate More Global Records
+              + Generate More Records
             </button>
             <span className="text-slate-300">|</span>
             <button

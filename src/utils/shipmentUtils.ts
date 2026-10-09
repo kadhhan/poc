@@ -1,4 +1,4 @@
-import { Shipment, SearchFilterState, ShipmentStatus } from '../types/shipment';
+import { Shipment, SearchFilterState, ShipmentStatus, LocationInfo } from '../types/shipment';
 
 export interface ShipmentSummary {
   totalShipments: number;
@@ -11,31 +11,84 @@ export interface ShipmentSummary {
   totalPieces: number;
 }
 
+export interface FilterResult {
+  directMatches: Shipment[];
+  alternativeMatches: Shipment[];
+  combinedResults: Shipment[];
+  hasAlternatives: boolean;
+  alternativeNote?: string;
+}
+
+export function matchesLocationString(loc: LocationInfo, query: string): boolean {
+  if (!query || query === 'ALL' || query.trim() === '') return true;
+  const q = query.trim().toLowerCase();
+
+  if (loc.city.toLowerCase().includes(q)) return true;
+  if (loc.code.toLowerCase().includes(q)) return true;
+  if (loc.country.toLowerCase().includes(q)) return true;
+  if (loc.airportName && loc.airportName.toLowerCase().includes(q)) return true;
+  if (loc.airportCode && loc.airportCode.toLowerCase().includes(q)) return true;
+  if (loc.seaportName && loc.seaportName.toLowerCase().includes(q)) return true;
+  if (loc.seaportCode && loc.seaportCode.toLowerCase().includes(q)) return true;
+
+  // Comprehensive alias & country nickname matching
+  if ((q === 'us' || q === 'usa' || q === 'america' || q === 'united states') && loc.country === 'United States') return true;
+  if ((q === 'uk' || q === 'britain' || q === 'great britain' || q === 'england' || q === 'united kingdom') && loc.country === 'United Kingdom') return true;
+  if ((q === 'uae' || q === 'emirates' || q === 'united arab emirates' || q === 'dubai' || q === 'abu dhabi') && loc.country === 'United Arab Emirates') return true;
+  if ((q === 'ksa' || q === 'saudi' || q === 'saudi arabia') && loc.country === 'Saudi Arabia') return true;
+  if ((q === 'korea' || q === 'south korea' || q === 'rok') && loc.country === 'South Korea') return true;
+  if ((q === 'vietnam' || q === 'viet nam') && loc.country === 'Vietnam') return true;
+  if ((q === 'germany' || q === 'deutschland') && loc.country === 'Germany') return true;
+  if ((q === 'holland' || q === 'netherlands') && loc.country === 'Netherlands') return true;
+  if ((q === 'india' || q === 'bharat') && loc.country === 'India') return true;
+  if ((q === 'china' || q === 'prc') && loc.country === 'China') return true;
+  if ((q === 'japan' || q === 'nippon') && loc.country === 'Japan') return true;
+
+  return false;
+}
+
+export function matchesKeyword(shipment: Shipment, keyword: string): boolean {
+  if (!keyword || keyword.trim() === '') return true;
+  const q = keyword.trim().toLowerCase();
+
+  if (shipment.id.toLowerCase().includes(q)) return true;
+  if (shipment.referenceNumber.toLowerCase().includes(q)) return true;
+  if (shipment.carrier.toLowerCase().includes(q)) return true;
+  if (shipment.cargoDescription.toLowerCase().includes(q)) return true;
+  if (shipment.vesselOrFlight.toLowerCase().includes(q)) return true;
+  if (shipment.containerOrPackageType.toLowerCase().includes(q)) return true;
+  if (shipment.origin.city.toLowerCase().includes(q)) return true;
+  if (shipment.origin.code.toLowerCase().includes(q)) return true;
+  if (shipment.origin.country.toLowerCase().includes(q)) return true;
+  if (shipment.destination.city.toLowerCase().includes(q)) return true;
+  if (shipment.destination.code.toLowerCase().includes(q)) return true;
+  if (shipment.destination.country.toLowerCase().includes(q)) return true;
+
+  if (shipment.origin.airportName && shipment.origin.airportName.toLowerCase().includes(q)) return true;
+  if (shipment.origin.airportCode && shipment.origin.airportCode.toLowerCase().includes(q)) return true;
+  if (shipment.origin.seaportName && shipment.origin.seaportName.toLowerCase().includes(q)) return true;
+  if (shipment.origin.seaportCode && shipment.origin.seaportCode.toLowerCase().includes(q)) return true;
+  if (shipment.destination.airportName && shipment.destination.airportName.toLowerCase().includes(q)) return true;
+  if (shipment.destination.airportCode && shipment.destination.airportCode.toLowerCase().includes(q)) return true;
+  if (shipment.destination.seaportName && shipment.destination.seaportName.toLowerCase().includes(q)) return true;
+  if (shipment.destination.seaportCode && shipment.destination.seaportCode.toLowerCase().includes(q)) return true;
+
+  return false;
+}
+
 export function filterShipments(
   shipments: Shipment[],
   filters: SearchFilterState
 ): Shipment[] {
   return shipments.filter((shipment) => {
-    // 1. Origin Filter (supports manual city name, code, or country)
-    if (filters.fromLocation && filters.fromLocation !== 'ALL' && filters.fromLocation.trim() !== '') {
-      const qFrom = filters.fromLocation.trim().toLowerCase();
-      const matchCity = shipment.origin.city.toLowerCase().includes(qFrom);
-      const matchCode = shipment.origin.code.toLowerCase().includes(qFrom);
-      const matchCountry = shipment.origin.country.toLowerCase().includes(qFrom);
-      if (!matchCity && !matchCode && !matchCountry) {
-        return false;
-      }
+    // 1. Origin Filter
+    if (!matchesLocationString(shipment.origin, filters.fromLocation)) {
+      return false;
     }
 
-    // 2. Destination Filter (supports manual city name, code, or country)
-    if (filters.toLocation && filters.toLocation !== 'ALL' && filters.toLocation.trim() !== '') {
-      const qTo = filters.toLocation.trim().toLowerCase();
-      const matchCity = shipment.destination.city.toLowerCase().includes(qTo);
-      const matchCode = shipment.destination.code.toLowerCase().includes(qTo);
-      const matchCountry = shipment.destination.country.toLowerCase().includes(qTo);
-      if (!matchCity && !matchCode && !matchCountry) {
-        return false;
-      }
+    // 2. Destination Filter
+    if (!matchesLocationString(shipment.destination, filters.toLocation)) {
+      return false;
     }
 
     // 3. Mode Filter (Air / Sea)
@@ -60,27 +113,29 @@ export function filterShipments(
     }
 
     // 6. Free text keyword search
-    if (filters.keyword && filters.keyword.trim() !== '') {
-      const q = filters.keyword.trim().toLowerCase();
-      const matchesId = shipment.id.toLowerCase().includes(q);
-      const matchesRef = shipment.referenceNumber.toLowerCase().includes(q);
-      const matchesCarrier = shipment.carrier.toLowerCase().includes(q);
-      const matchesDesc = shipment.cargoDescription.toLowerCase().includes(q);
-      const matchesOrigin =
-        shipment.origin.city.toLowerCase().includes(q) ||
-        shipment.origin.code.toLowerCase().includes(q);
-      const matchesDest =
-        shipment.destination.city.toLowerCase().includes(q) ||
-        shipment.destination.code.toLowerCase().includes(q);
-      const matchesVessel = shipment.vesselOrFlight.toLowerCase().includes(q);
-
-      if (!matchesId && !matchesRef && !matchesCarrier && !matchesDesc && !matchesOrigin && !matchesDest && !matchesVessel) {
-        return false;
-      }
+    if (!matchesKeyword(shipment, filters.keyword)) {
+      return false;
     }
 
     return true;
   });
+}
+
+/**
+ * Standard robust search for shipments matching all active filters.
+ */
+export function searchShipmentsWithAlternatives(
+  shipments: Shipment[],
+  filters: SearchFilterState
+): FilterResult {
+  const direct = filterShipments(shipments, filters);
+  return {
+    directMatches: direct,
+    alternativeMatches: [],
+    combinedResults: direct,
+    hasAlternatives: false,
+    alternativeNote: undefined,
+  };
 }
 
 export function calculateSummary(shipments: Shipment[]): ShipmentSummary {
@@ -122,48 +177,114 @@ export function formatWeight(kg: number): string {
   return `${kg.toLocaleString()} kg`;
 }
 
-export function exportShipmentsToCSV(shipments: Shipment[], filename = 'shipments-export.csv') {
-  if (shipments.length === 0) return;
+export function getStatusStyle(status: ShipmentStatus): {
+  badge: string;
+  dot: string;
+  bg: string;
+} {
+  switch (status) {
+    case 'Booked':
+      return {
+        badge: 'bg-amber-50 text-amber-800 border-amber-200/80',
+        dot: 'bg-amber-500',
+        bg: 'bg-amber-50',
+      };
+    case 'In Transit':
+      return {
+        badge: 'bg-blue-50 text-blue-800 border-blue-200/80',
+        dot: 'bg-blue-600 animate-pulse',
+        bg: 'bg-blue-50',
+      };
+    case 'Arrived':
+      return {
+        badge: 'bg-indigo-50 text-indigo-800 border-indigo-200/80',
+        dot: 'bg-indigo-600',
+        bg: 'bg-indigo-50',
+      };
+    case 'Delivered':
+      return {
+        badge: 'bg-emerald-50 text-emerald-800 border-emerald-200/80',
+        dot: 'bg-emerald-600',
+        bg: 'bg-emerald-50',
+      };
+    default:
+      return {
+        badge: 'bg-slate-50 text-slate-800 border-slate-200',
+        dot: 'bg-slate-500',
+        bg: 'bg-slate-50',
+      };
+  }
+}
 
+export function exportShipmentsToCSV(shipments: Shipment[], filename = 'shipments-export.csv') {
   const headers = [
     'Shipment ID',
+    'Reference Type',
+    'Reference Number',
     'Origin City',
     'Origin Code',
+    'Origin Country',
+    'Origin Airport',
+    'Origin Seaport',
     'Destination City',
     'Destination Code',
+    'Destination Country',
+    'Destination Airport',
+    'Destination Seaport',
     'Carrier',
     'Transport Mode',
+    'Vessel or Flight',
     'ETD',
     'ETA',
     'Pieces',
     'Gross Weight (kg)',
+    'Volume (CBM)',
     'Status',
-    'Reference Type',
-    'Reference No',
-    'Flight / Vessel',
+    'Service Level',
     'Cargo Description',
+    'Container or Package Type',
+    'Consignor (Shipper)',
+    'Consignee (Receiver)',
   ];
+
+  const escapeCSV = (value: any) => {
+    if (value === null || value === undefined) return '""';
+    const str = String(value).replace(/"/g, '""');
+    return `"${str}"`;
+  };
 
   const rows = shipments.map((s) => [
     s.id,
+    s.referenceType,
+    s.referenceNumber,
     s.origin.city,
     s.origin.code,
+    s.origin.country,
+    s.origin.airportName || '',
+    s.origin.seaportName || '',
     s.destination.city,
     s.destination.code,
+    s.destination.country,
+    s.destination.airportName || '',
+    s.destination.seaportName || '',
     s.carrier,
     s.mode,
+    s.vesselOrFlight,
     s.etd,
     s.eta,
     s.pieces,
     s.grossWeightKg,
+    s.volumeCbm || '',
     s.status,
-    s.referenceType,
-    s.referenceNumber,
-    s.vesselOrFlight,
-    `"${s.cargoDescription.replace(/"/g, '""')}"`,
+    s.serviceLevel,
+    s.cargoDescription,
+    s.containerOrPackageType,
+    s.consignor,
+    s.consignee,
   ]);
 
-  const csvContent = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+  const csvContent = [headers.join(','), ...rows.map((r) => r.map(escapeCSV).join(','))].join('\r\n');
+
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
@@ -173,38 +294,4 @@ export function exportShipmentsToCSV(shipments: Shipment[], filename = 'shipment
   link.click();
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
-}
-
-export function getStatusStyle(status: ShipmentStatus): {
-  badge: string;
-  dot: string;
-  label: string;
-} {
-  switch (status) {
-    case 'In Transit':
-      return {
-        badge: 'bg-blue-50 text-blue-700 border-blue-200/80',
-        dot: 'bg-blue-500 ring-blue-300',
-        label: 'In Transit',
-      };
-    case 'Delivered':
-      return {
-        badge: 'bg-emerald-50 text-emerald-700 border-emerald-200/80',
-        dot: 'bg-emerald-500 ring-emerald-300',
-        label: 'Delivered',
-      };
-    case 'Arrived':
-      return {
-        badge: 'bg-purple-50 text-purple-700 border-purple-200/80',
-        dot: 'bg-purple-500 ring-purple-300',
-        label: 'Arrived',
-      };
-    case 'Booked':
-    default:
-      return {
-        badge: 'bg-amber-50 text-amber-700 border-amber-200/80',
-        dot: 'bg-amber-500 ring-amber-300',
-        label: 'Booked',
-      };
-  }
 }

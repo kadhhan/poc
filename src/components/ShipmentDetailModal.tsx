@@ -24,7 +24,10 @@ interface ShipmentDetailModalProps {
   onClose: () => void;
 }
 
-export const ShipmentDetailModal: React.FC<ShipmentDetailModalProps> = ({ shipment, onClose }) => {
+export const ShipmentDetailModal: React.FC<ShipmentDetailModalProps> = ({
+  shipment,
+  onClose,
+}) => {
   const [copied, setCopied] = React.useState(false);
 
   useEffect(() => {
@@ -105,26 +108,33 @@ export const ShipmentDetailModal: React.FC<ShipmentDetailModalProps> = ({ shipme
                     {shipment.origin.city}
                   </span>
                 </div>
-                <div className="text-[11px] text-slate-400">{shipment.origin.country}</div>
+                <div className="text-[11px] text-slate-300">
+                  {shipment.mode === 'Air'
+                    ? shipment.origin.airportName || `${shipment.origin.city} Airport`
+                    : shipment.origin.seaportName || `${shipment.origin.city} Port`}
+                </div>
+                <div className="text-[10px] text-slate-400">{shipment.origin.country}</div>
               </div>
 
               <div className="flex flex-col items-center px-4">
-                <span className="text-[10px] text-slate-400 font-medium mb-1">
-                  {shipment.mode} Freight
+                <span className={`text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded ${
+                  shipment.mode === 'Air' ? 'bg-sky-950 text-sky-400 border border-sky-800' : 'bg-teal-950 text-teal-400 border border-teal-800'
+                }`}>
+                  {shipment.mode === 'Air' ? '✈ Air Cargo' : '⚓ Ocean Freight'}
                 </span>
-                <div className="flex items-center text-blue-400">
+                <div className="flex items-center text-blue-400 my-1">
                   <span className="w-10 sm:w-16 h-0.5 bg-blue-500/40 inline-block"></span>
                   <ArrowRight className="w-4 h-4 mx-1" />
                   <span className="w-10 sm:w-16 h-0.5 bg-blue-500/40 inline-block"></span>
                 </div>
-                <span className="text-[10px] text-slate-400 font-mono mt-1">
+                <span className="text-[10px] text-slate-300 font-mono">
                   {shipment.vesselOrFlight}
                 </span>
               </div>
 
               <div>
                 <div className="text-[11px] font-semibold tracking-wider text-slate-400 uppercase text-right">
-                  Destination
+                  {shipment.mode === 'Air' ? 'Destination Airport' : 'Destination Seaport'}
                 </div>
                 <div className="text-xl font-bold font-mono tracking-tight flex items-baseline gap-1.5 justify-end">
                   <span className="text-xs font-normal text-slate-300">
@@ -132,9 +142,12 @@ export const ShipmentDetailModal: React.FC<ShipmentDetailModalProps> = ({ shipme
                   </span>
                   <span>{shipment.destination.code}</span>
                 </div>
-                <div className="text-[11px] text-slate-400 text-right">
-                  {shipment.destination.country}
+                <div className="text-[11px] text-slate-300 text-right">
+                  {shipment.mode === 'Air'
+                    ? shipment.destination.airportName || `${shipment.destination.city} Airport`
+                    : shipment.destination.seaportName || `${shipment.destination.city} Port`}
                 </div>
+                <div className="text-[10px] text-slate-400 text-right">{shipment.destination.country}</div>
               </div>
             </div>
 
@@ -304,13 +317,13 @@ export const ShipmentDetailModal: React.FC<ShipmentDetailModalProps> = ({ shipme
         </div>
 
         {/* Modal Footer */}
-        <div className="px-6 py-3 border-t border-slate-200 bg-slate-50 flex items-center justify-between">
+        <div className="px-6 py-3 border-t border-slate-200 bg-slate-50 flex items-center justify-between gap-3">
           <div className="text-[11px] text-slate-500">
-            Fictional Proof of Concept record for route validation.
+            Commercial logistics checkpoint data · Verified milestones.
           </div>
           <button
             onClick={onClose}
-            className="px-4 py-1.5 bg-slate-800 hover:bg-slate-900 text-white text-xs font-medium rounded-md transition-colors shadow-2xs"
+            className="px-4 py-1.5 bg-slate-800 hover:bg-slate-900 text-white text-xs font-medium rounded-md transition-colors shadow-2xs cursor-pointer"
           >
             Close Details
           </button>

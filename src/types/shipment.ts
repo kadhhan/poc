@@ -6,6 +6,23 @@ export interface LocationInfo {
   city: string;
   code: string;
   country: string;
+  airportName?: string;
+  airportCode?: string;
+  seaportName?: string;
+  seaportCode?: string;
+  lat?: number;
+  lng?: number;
+}
+
+export interface RouteWaypoint {
+  name: string;
+  code: string;
+  type: 'Airport' | 'Seaport' | 'Maritime Waypoint' | 'Canal Hub';
+  lat: number;
+  lng: number;
+  status: 'Departed' | 'Passed' | 'Approaching' | 'Scheduled';
+  timestamp?: string;
+  description?: string;
 }
 
 export interface Milestone {
@@ -40,6 +57,16 @@ export interface Shipment {
   consignor: string; // Shipper
   consignee: string; // Receiver
   milestones: Milestone[];
+
+  // Route Waypoints & Position for Track & Trace Map
+  waypoints?: RouteWaypoint[];
+  currentPosition?: {
+    lat: number;
+    lng: number;
+    label: string;
+    progressPercent: number;
+    statusText: string;
+  };
 }
 
 export interface SearchFilterState {
