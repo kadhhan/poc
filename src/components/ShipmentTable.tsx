@@ -38,6 +38,13 @@ export const ShipmentTable: React.FC<ShipmentTableProps> = ({
 }) => {
   const [sortField, setSortField] = useState<SortField>('etd');
   const [sortAsc, setSortAsc] = useState<boolean>(true);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(25);
+
+  // Reset page when shipments list changes
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [shipments.length]);
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -102,6 +109,10 @@ export const ShipmentTable: React.FC<ShipmentTableProps> = ({
     if (aVal > bVal) return sortAsc ? 1 : -1;
     return 0;
   });
+
+  const totalPages = Math.max(1, Math.ceil(sortedShipments.length / pageSize));
+  const startIndex = (currentPage - 1) * pageSize;
+  const paginatedShipments = sortedShipments.slice(startIndex, startIndex + pageSize);
 
   const renderSortIcon = (field: SortField) => {
     if (sortField !== field) {
@@ -210,7 +221,7 @@ export const ShipmentTable: React.FC<ShipmentTableProps> = ({
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200/70">
-            {sortedShipments.map((s) => {
+            {paginatedShipments.map((s) => {
               const statusStyle = getStatusStyle(s.status);
               return (
                 <tr
@@ -325,7 +336,7 @@ export const ShipmentTable: React.FC<ShipmentTableProps> = ({
 
       {/* Mobile Card List View (< md screens) */}
       <div className="md:hidden divide-y divide-slate-200">
-        {sortedShipments.map((s) => {
+        {paginatedShipments.map((s) => {
           const statusStyle = getStatusStyle(s.status);
           return (
             <div
@@ -424,6 +435,64 @@ export const ShipmentTable: React.FC<ShipmentTableProps> = ({
           );
         })}
       </div>
+
+      {/* Pagination & Results Bar */}
+      {shipments.length > 0 && (
+        <div className="px-4 sm:px-6 py-3 border-t border-slate-200 bg-slate-50/75 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-600">
+          <div className="flex items-center gap-3">
+            <span>
+              Showing <strong className="font-mono text-slate-900">{startIndex + 1}</strong> to{' '}
+              <strong className="font-mono text-slate-900">
+                {Math.min(startIndex + pageSize, shipments.length)}
+              </strong>{' '}
+              of <strong className="font-mono text-slate-900">{shipments.length}</strong> shipments
+            </span>
+
+            <div className="flex items-center gap-1.5 ml-2">
+              <span className="text-slate-400 text-[11px]">Rows:</span>
+              <select
+                value={pageSize}
+                onChange={(e) => {
+                  setPageSize(Number(e.target.value));
+                  setCurrentPage(1);
+                }}
+                className="bg-white border border-slate-300 rounded px-1.5 py-0.5 text-xs text-slate-700"
+              >
+                <option value={15}>15</option>
+                <option value={25}>25</option>
+                <option value={50}>50</option>
+                <option value={100}>100</option>
+              </select>
+            </div>
+          </div>
+
+          {totalPages > 1 && (
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                className="px-2.5 py-1 rounded border border-slate-300 bg-white text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors font-medium text-xs"
+              >
+                Previous
+              </button>
+
+              <span className="px-2 text-xs font-mono text-slate-500">
+                Page {currentPage} of {totalPages}
+              </span>
+
+              <button
+                type="button"
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                className="px-2.5 py-1 rounded border border-slate-300 bg-white text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors font-medium text-xs"
+              >
+                Next
+              </button>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

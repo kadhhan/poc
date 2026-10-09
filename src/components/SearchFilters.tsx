@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Search, RotateCcw, ArrowRightLeft, Filter, Plane, Ship } from 'lucide-react';
-import { SearchFilterState } from '../types/shipment';
+import { SearchFilterState, Shipment } from '../types/shipment';
 import { LocationSearchInput } from './LocationSearchInput';
 
 interface SearchFiltersProps {
@@ -8,6 +8,7 @@ interface SearchFiltersProps {
   onApplyFilters: (newFilters: SearchFilterState) => void;
   onReset: () => void;
   availableCarriers: string[];
+  shipments: Shipment[];
 }
 
 export const SearchFilters: React.FC<SearchFiltersProps> = ({
@@ -15,6 +16,7 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
   onApplyFilters,
   onReset,
   availableCarriers,
+  shipments,
 }) => {
   // Local state so user can select filters and press "Search" (or enter)
   const [localFilters, setLocalFilters] = useState<SearchFilterState>(filters);
@@ -80,6 +82,7 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
               iconColor="text-blue-600"
               placeholder="Type origin city (e.g. Mumbai, BOM...)"
               value={localFilters.fromLocation}
+              shipments={shipments}
               onChange={(val) => {
                 setLocalFilters((prev) => ({ ...prev, fromLocation: val }));
               }}
@@ -108,6 +111,7 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
               iconColor="text-red-500"
               placeholder="Type destination city (e.g. Jeddah, JED...)"
               value={localFilters.toLocation}
+              shipments={shipments}
               onChange={(val) => {
                 setLocalFilters((prev) => ({ ...prev, toLocation: val }));
               }}
