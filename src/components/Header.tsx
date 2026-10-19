@@ -1,6 +1,6 @@
 import React from 'react';
 import { HelpCircle, FileSpreadsheet, Sparkles, Play } from 'lucide-react';
-import { HmdLogo } from './HmdLogo';
+import { CompassLogo } from './CompassLogo';
 
 interface HeaderProps {
   onOpenGuide: () => void;
@@ -23,22 +23,22 @@ export const Header: React.FC<HeaderProps> = ({
     <header className="border-b border-slate-200 bg-white sticky top-0 z-20 shadow-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo & Title: HMD Global Shipments */}
+          {/* Logo & Title: Compass Global Logistics */}
           <div className="flex items-center space-x-3.5">
-            <div className="flex items-center justify-center p-2 px-2.5 bg-slate-900 rounded-lg shadow-sm border border-slate-800 hover:border-slate-700 transition-colors">
-              <HmdLogo className="h-6 w-auto" />
+            <div className="flex items-center justify-center p-1 px-2.5 bg-white rounded-lg shadow-2xs border border-slate-200/90 hover:border-slate-300 transition-colors">
+              <CompassLogo className="h-8 w-auto object-contain" />
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-lg font-bold text-slate-900 tracking-tight leading-tight">
-                  HMD Global Shipments
+                  Compass Global Logistics
                 </h1>
                 <span className="text-[11px] font-medium tracking-wide uppercase px-2 py-0.5 bg-blue-50 text-blue-700 border border-blue-200/60 rounded">
                   {totalCatalogCount} global records
                 </span>
               </div>
               <p className="text-xs text-slate-500 font-normal">
-                Connecting the World, One Shipment at a Time.
+                Shipment Explorer — Connecting the World, One Shipment at a Time.
               </p>
             </div>
           </div>

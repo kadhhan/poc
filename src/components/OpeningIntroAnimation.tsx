@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FastForward, Zap } from 'lucide-react';
-import { HmdLogo } from './HmdLogo';
+import { CompassLogo } from './CompassLogo';
 
 interface OpeningIntroAnimationProps {
   onComplete: () => void;
@@ -44,7 +44,7 @@ export const OpeningIntroAnimation: React.FC<OpeningIntroAnimationProps> = ({ on
       className={`fixed inset-0 z-50 overflow-hidden bg-[#030712] select-none transition-all duration-700 ease-out ${
         phase === 'exiting' ? 'opacity-0 scale-105 pointer-events-none' : 'opacity-100 scale-100'
       }`}
-      aria-label="Opening Animation - HMD Global Shipments"
+      aria-label="Opening Animation - Compass Global Logistics"
     >
       {/* Skip Button - Cyber Neon Glass */}
       <div className="absolute top-6 right-6 z-40">
@@ -444,7 +444,7 @@ export const OpeningIntroAnimation: React.FC<OpeningIntroAnimationProps> = ({ on
         </div>
       </div>
 
-      {/* --- CENTER BRANDING REVEAL: "HMD global shipments" IN ELECTRIC NEON --- */}
+      {/* --- CENTER BRANDING REVEAL: "Compass Global Logistics" IN ELECTRIC NEON --- */}
       <div className="absolute inset-0 z-30 flex items-center justify-center p-4">
         <div
           className={`text-center max-w-4xl transform transition-all duration-1000 ease-out ${
@@ -453,19 +453,19 @@ export const OpeningIntroAnimation: React.FC<OpeningIntroAnimationProps> = ({ on
               : 'opacity-100 translate-y-0 scale-100 blur-0'
           }`}
         >
-          {/* Neon Emblem Icon - Official HMD Brand Logo */}
+          {/* Neon Emblem Icon - Official Compass Brand Logo */}
           <div className="inline-flex items-center justify-center mb-6 relative">
-            <div className="px-6 py-3.5 sm:px-8 sm:py-4.5 rounded-2xl bg-gradient-to-tr from-cyan-400 via-fuchsia-500 to-emerald-400 p-[2px] shadow-[0_0_50px_rgba(0,245,255,0.8),0_0_80px_rgba(255,0,127,0.4)]">
-              <div className="w-full h-full bg-[#050914] rounded-2xl flex items-center justify-center px-4 py-2 border border-cyan-400/40">
-                <HmdLogo className="h-10 sm:h-14 w-auto drop-shadow-[0_0_16px_rgba(71,215,172,0.8)]" glow />
+            <div className="px-6 py-3.5 sm:px-8 sm:py-4.5 rounded-2xl bg-gradient-to-tr from-lime-400 via-emerald-400 to-cyan-400 p-[2px] shadow-[0_0_50px_rgba(141,198,63,0.7),0_0_80px_rgba(0,180,100,0.4)]">
+              <div className="w-full h-full bg-white rounded-2xl flex items-center justify-center px-6 py-3 border border-lime-400/50 shadow-inner">
+                <CompassLogo className="h-12 sm:h-16 w-auto object-contain drop-shadow-[0_0_16px_rgba(141,198,63,0.8)]" glow />
               </div>
             </div>
             {/* Pulsing Neon Halo Rings */}
-            <div className="absolute -inset-2 rounded-2xl bg-cyan-400/20 blur-xl -z-10 animate-pulse"></div>
-            <div className="absolute -inset-4 rounded-3xl bg-fuchsia-500/15 blur-2xl -z-10"></div>
+            <div className="absolute -inset-2 rounded-2xl bg-lime-400/20 blur-xl -z-10 animate-pulse"></div>
+            <div className="absolute -inset-4 rounded-3xl bg-emerald-500/15 blur-2xl -z-10"></div>
           </div>
 
-          {/* Brand Name: "HMD global shipments" with Neon Tube Light Glow */}
+          {/* Brand Name: "Compass Global Logistics" with Neon Tube Light Glow */}
           <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-white mb-3">
             <span
               className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-300 via-fuchsia-200 to-pink-400"
@@ -474,7 +474,7 @@ export const OpeningIntroAnimation: React.FC<OpeningIntroAnimationProps> = ({ on
                   '0 0 15px rgba(0, 245, 255, 0.9), 0 0 35px rgba(0, 245, 255, 0.6), 0 0 60px rgba(255, 0, 127, 0.5)',
               }}
             >
-              HMD global shipments
+              Compass Global Logistics
             </span>
           </h1>
 

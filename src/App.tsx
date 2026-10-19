@@ -30,7 +30,7 @@ export default function App() {
   // Opening Intro Animation state (only on initial website load per session)
   const [showIntro, setShowIntro] = useState<boolean>(() => {
     try {
-      return !sessionStorage.getItem('hmd_intro_viewed');
+      return !sessionStorage.getItem('compass_intro_viewed') && !sessionStorage.getItem('hmd_intro_viewed');
     } catch {
       return true;
     }
@@ -38,7 +38,7 @@ export default function App() {
 
   const handleIntroComplete = () => {
     try {
-      sessionStorage.setItem('hmd_intro_viewed', 'true');
+      sessionStorage.setItem('compass_intro_viewed', 'true');
     } catch {
       // ignore
     }
@@ -185,7 +185,7 @@ export default function App() {
   };
 
   const handleExportCSV = () => {
-    exportShipmentsToCSV(filteredShipments, `hmd-shipments-${new Date().toISOString().split('T')[0]}.csv`);
+    exportShipmentsToCSV(filteredShipments, `compass-shipments-${new Date().toISOString().split('T')[0]}.csv`);
   };
 
   return (
@@ -260,7 +260,7 @@ export default function App() {
       <footer className="border-t border-slate-200 bg-white py-4 mt-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2">
           <div className="flex items-center gap-2">
-            <span className="font-semibold text-slate-700">HMD Global Shipments</span>
+            <span className="font-semibold text-slate-700">Compass Global Logistics</span>
             <span>·</span>
             <span>Connecting the World, One Shipment at a Time.</span>
           </div>

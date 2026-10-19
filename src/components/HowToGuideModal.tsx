@@ -25,7 +25,7 @@ export const HowToGuideModal: React.FC<HowToGuideModalProps> = ({ isOpen, onClos
             </div>
             <div>
               <h2 className="text-base font-bold text-slate-900">
-                Logistics Shipment Explorer — Technical Guide
+                Compass Global Logistics — Technical Guide
               </h2>
               <p className="text-xs text-slate-500">
                 POC Architecture, Data Models & Setup Instructions
